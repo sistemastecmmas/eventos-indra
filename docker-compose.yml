@@ -1,0 +1,18 @@
+version: '3'
+services:
+  eventos-indra:
+    restart: always
+    build: .
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./src:/usr/src/app/src
+    command: yarn start
+    environment:
+      - USER_DB
+      - USER_DB_PASSWORD
+      - NAME_DB
+      - PORT_DB
+      - HOST_DB
+      - PORT
+      - IP_SICOV

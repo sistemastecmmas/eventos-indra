@@ -1,0 +1,11 @@
+version: '3'
+services:
+  eventos-indra:
+    build: 
+      context: .
+      dockerfile: dockerfile.prod
+    image: sistemastecmmas/eventos-indra
+    ports:
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
