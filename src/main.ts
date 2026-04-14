@@ -9,6 +9,6 @@ async function bootstrap() {
   Logger.log('Application started successfully');
   await app.listen(envs.PORT ?? 3000);
   Logger.log(`Application is running on port ${envs.PORT ?? 3000}`);
-  Logger.log(`Version: 2.0.0`);
+  Logger.log(`Version: 3.0.0`);
 }
 bootstrap();
