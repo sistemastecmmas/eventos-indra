@@ -12,6 +12,6 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '10mb' }));
   await app.listen(envs.PORT ?? 3000);
   Logger.log(`Application is running on port ${envs.PORT ?? 3000}`);
-  Logger.log(`Version: 3.0.0`);
+  Logger.log(`Version: 3.0.1`);
 }
 bootstrap();
