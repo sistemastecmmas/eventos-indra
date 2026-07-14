@@ -8,6 +8,7 @@ export async function enviarEventosSicov(url: string, cadena: string): Promise<a
 
 export async function enviarFurSicov(url: string, cadena: string): Promise<any> {
   const client = await soap.createClientAsync(url);
+  client.addHttpHeader('X-Service-Version', '19');
   const result = await client.EnviarFurSicovAsync({ cadena });
   return result[0].EnviarFurSicovResult;
 }
