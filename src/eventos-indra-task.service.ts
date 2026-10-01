@@ -51,7 +51,7 @@ export class EventosIndraTaskService {
                     let cad = `${datos_[0]}|${datos_[1]}|${datos_[2]}|${datos_[3]}|${datos_[4]}|${datos_[5]}||${idRunt}`;
                     if (datos_[2] !== 'Ruidos') {
                         let eve = encryptRijndael128CBC(key, iv, cad);
-                        const respuesta = await enviarEventosSicov(endpoint.wsdlUrl, eve);
+                        const respuesta = await enviarEventosSicov(endpoint.wsdlUrl, eve, endpoint.location);
                         let estado = 'error';
                         let msg = 'Operación Fallida';
                         let enviado = '2';

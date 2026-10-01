@@ -46,7 +46,7 @@ export class FurIndraService {
 
             let eve = encryptRijndael128CBC(key, iv, fur);
             //  console.log(`Encrypted FUR: ${eve}`);
-            respuesta = await enviarFurSicov(endpoint.wsdlUrl, eve);
+            respuesta = await enviarFurSicov(endpoint.wsdlUrl, eve, endpoint.location);
             //  console.log(`Respuesta de SICOV: ${JSON.stringify(respuesta)}`);
             //  console.log(`Respuesta codigo de SICOV: ${respuesta.codRespuesta}`);
             let estado = 'error';

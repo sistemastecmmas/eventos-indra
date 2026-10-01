@@ -12,6 +12,8 @@ export type ResolvedSicovEndpoint = {
     host: string;
     port: number;
     wsdlUrl: string;
+    /** Destino de la llamada SOAP (sin ?WSDL). Solo cuando se configuró una URL completa. */
+    location?: string;
     isIndra: boolean;
     activo: string;
     configuredUrl: string;
@@ -55,16 +57,31 @@ export class SicovEndpointService {
         }
     }
 
-    parseHostPort(value?: string): { host: string; port: number } {
+    /**
+     * Acepta "host", "host:puerto" o URL completa (con o sin puerto).
+     * Sin puerto: 80 para http y 443 para https.
+     */
+    parseHostPort(value?: string): { host: string; port: number; isUrl: boolean; url?: URL } {
         const raw = String(value ?? '').trim();
 
         if (!raw) {
-            return { host: '', port: 80 };
+            return { host: '', port: 80, isUrl: false };
+        }
+
+        if (/^https?:\/\//i.test(raw)) {
+            try {
+                const url = new URL(raw);
+                const defaultPort = url.protocol === 'https:' ? 443 : 80;
+                const port = url.port ? Number.parseInt(url.port, 10) : defaultPort;
+                return { host: url.hostname, port, isUrl: true, url };
+            } catch {
+                return { host: '', port: 80, isUrl: false };
+            }
         }
 
         const hasPort = raw.includes(':');
         if (!hasPort) {
-            return { host: raw, port: 80 };
+            return { host: raw, port: 80, isUrl: false };
         }
 
         const [hostRaw, portRaw] = raw.split(':');
@@ -75,6 +92,7 @@ export class SicovEndpointService {
         return {
             host,
             port,
+            isUrl: false,
         };
     }
 
@@ -85,12 +103,22 @@ export class SicovEndpointService {
 
         const useAlternativo = alternativoState.activo === '1' && alternativoState.url.length > 0;
         const configuredUrl = useAlternativo ? alternativoState.url : baseUrl;
-        const { host, port } = this.parseHostPort(configuredUrl);
+        const { host, port, isUrl, url } = this.parseHostPort(configuredUrl);
+
+        // URL completa: se usa tal cual (con ?WSDL si no trae query) y la llamada SOAP se fuerza a esa misma URL.
+        // host o host:puerto: se arma http://host:puerto/sicov.asmx?WSDL como siempre.
+        let wsdlUrl = host ? `http://${host}:${port}/sicov.asmx?WSDL` : '';
+        let location: string | undefined;
+        if (isUrl && url && host) {
+            location = `${url.origin}${url.pathname}`;
+            wsdlUrl = url.search ? `${location}${url.search}` : `${location}?WSDL`;
+        }
 
         return {
             host,
             port,
-            wsdlUrl: host ? `http://${host}:${port}/sicov.asmx?WSDL` : '',
+            wsdlUrl,
+            location,
             isIndra: true,
             activo: alternativoState.activo,
             configuredUrl,
